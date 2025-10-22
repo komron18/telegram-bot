@@ -71,6 +71,14 @@ async def handle_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     info = ydl.extract_info(url, download=True)
                     filepath = ydl.prepare_filename(info)
 
+# если файл без расширения, пытаемся найти подходящий
+if not os.path.exists(filepath):
+    base_dir = os.path.dirname(filepath)
+    file_list = os.listdir(base_dir)
+    if file_list:
+        filepath = os.path.join(base_dir, file_list[0])
+
+
                 # Отправляем видео с фирменной подписью
                 caption = f"🎬 Из: {url}\nКак вам такое, Мафтуна? 😏"
                 with open(filepath, "rb") as f:
