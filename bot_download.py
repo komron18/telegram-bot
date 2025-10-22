@@ -65,12 +65,38 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # Обход Instagram API (важно!)
                 ydl_opts["force_generic_extractor"] = True
 
-                # Скачиваем видео
+                # --- Скачивание ---
                 with YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(url, download=True)
                     filepath = ydl.prepare_filename(info)
 
-                # Проверяем файл
+                # --- Если это альбом (несколько фото/видео) ---
+                if info.get("entries"):
+                    media_files = []
+                    for entry in info["entries"]:
+                        subfile = os.path.join(td, f"{entry.get('title','media')}.{entry.get('ext','jpg')}")
+                        if os.path.exists(subfile):
+                            media_files.append(subfile)
+                    if not media_files:
+                        files = os.listdir(td)
+                        media_files = [os.path.join(td, f) for f in files]
+
+                    if media_files:
+                        for file in media_files[:5]:  # максимум 5 медиа
+                            with open(file, "rb") as f:
+                                if file.lower().endswith(".mp4"):
+                                    await update.message.reply_video(
+                                        video=InputFile(f),
+                                        caption=f"🎬 Из: {url}\nКак вам такое, Мафтуна? 😏"
+                                    )
+                                else:
+                                    await update.message.reply_photo(
+                                        photo=InputFile(f),
+                                        caption=f"📷 Из: {url}\nКак вам такое, Мафтуна? 😏"
+                                    )
+                        continue
+
+                # --- Обычный одиночный пост ---
                 if not os.path.exists(filepath):
                     files = os.listdir(td)
                     if files:
@@ -79,22 +105,20 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if not os.path.exists(filepath):
                     await update.message.reply_text(
                         f"⚠️ Instagram не дал файл по ссылке:\n{url}\n"
-                        "Возможно, пост приватный или удалён."
+                        "Пост может быть временно недоступен."
                     )
                     continue
 
-                # Отправляем видео (или документ, если не удаётся)
-                try:
-                    with open(filepath, "rb") as f:
+                with open(filepath, "rb") as f:
+                    if filepath.lower().endswith(".mp4"):
                         await update.message.reply_video(
                             video=InputFile(f),
-                            caption=f"🎬 Из: {url}\nКак вам такое, Мафтуна? 😏",
+                            caption=f"🎬 Из: {url}\nКак вам такое, Мафтуна? 😏"
                         )
-                except Exception:
-                    with open(filepath, "rb") as f:
-                        await update.message.reply_document(
-                            document=InputFile(f),
-                            caption=f"📄 Из: {url}\nКак вам такое, Мафтуна? 😏",
+                    else:
+                        await update.message.reply_photo(
+                            photo=InputFile(f),
+                            caption=f"📷 Из: {url}\nКак вам такое, Мафтуна? 😏"
                         )
 
             except Exception as e:
@@ -106,3 +130,4 @@ if __name__ == "__main__":
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle))
     print("✅ Бот запущен и ждёт ссылки...")
     app.run_polling()
+    
