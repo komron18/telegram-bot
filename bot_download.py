@@ -68,13 +68,13 @@ async def handle_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     info = ydl.extract_info(url, download=True)
                     filepath = ydl.prepare_filename(info)
 
-                    # Если файл не найден — ищем вручную
-                    if not os.path.exists(filepath):
-                        files = os.listdir(td)
-                        if files:
-                            filepath = os.path.join(td, files[0])
+                # Исправление бага Instagram (.NA)
+                if not os.path.exists(filepath):
+                    files = os.listdir(td)
+                    if files:
+                        filepath = os.path.join(td, files[0])
 
-                # Отправка медиа
+                # Отправляем как видео или фото
                 caption = f"🎬 Из: {url}\nКак вам такое, Мафтуна? 😏"
                 with open(filepath, "rb") as f:
                     if filepath.lower().endswith(".mp4"):
@@ -85,7 +85,7 @@ async def handle_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 await update.message.reply_text(f"⚠️ Ошибка при обработке {url}:\n{e}")
 
-# === Обработка фото, присланных вручную ===
+# === Обработка фото ===
 async def handle_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photos = update.message.photo
     temp_files = []
