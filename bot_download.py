@@ -63,7 +63,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     ydl_opts["cookiefile"] = cookie_file
 
                 # Обход Instagram API (важно!)
-                ydl_opts["force_generic_extractor"] = True
+                "extractor_args"] = {"instagram": ["proxies=https://1.1.1.1:8080", "highlights=True"]}
 
                 # --- Скачивание ---
                 with YoutubeDL(ydl_opts) as ydl:
