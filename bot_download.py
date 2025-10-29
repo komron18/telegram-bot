@@ -100,12 +100,12 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             if file.lower().endswith(".mp4"):
                                 await update.message.reply_video(
                                     video=InputFile(f),
-                                    caption=f"🎬 Из: {url}\nКак вам такое, Мафтуна? 😏"
+                                    caption=f"Как вам такое коллеги?"
                                 )
                             else:
                                 await update.message.reply_photo(
                                     photo=InputFile(f),
-                                    caption=f"📷 Из: {url}\nКак вам такое, Мафтуна? 😏"
+                                    caption=f"Как вам такое коллеги?"
                                 )
                     # переходим к следующей ссылке
                     continue
@@ -129,12 +129,12 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if filepath.lower().endswith(".mp4"):
                         await update.message.reply_video(
                             video=InputFile(f),
-                            caption=f"🎬 Из: {url}\nКак вам такое, Мафтуна? 😏"
+                            caption=f"🎬Как вам такое коллеги? 😏"
                         )
                     else:
                         await update.message.reply_photo(
                             photo=InputFile(f),
-                            caption=f"📷 Из: {url}\nКак вам такое, Мафтуна? 😏"
+                            caption=f"Как вам такое коллеги?"
                         )
 
             except Exception as e:
